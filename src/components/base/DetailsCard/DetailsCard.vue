@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Character } from '@/types/filmTypes'
+import type { Character, CharacterMeta } from '@/types/filmTypes'
 
 import { computed, ref, watch } from 'vue'
 
@@ -7,6 +7,12 @@ const props = defineProps(['film', 'id'])
 const emit = defineEmits(['setCharacters'])
 
 const characterDetails = ref<Character>()
+const displayData = ref<CharacterMeta> ({
+  gender: '',
+  hair_color: '',
+  eye_color: '',
+  birth_year: ''
+});
 
 const dateToDisplay = computed<string>(() => {
   return props.film?.release_date?.split('-')[0] || ''
@@ -16,12 +22,18 @@ const getCharacter = async (): Promise<void> => {
   const character =  await fetch(`https://swapi.dev/api/people/${props.id}`)
 
   characterDetails.value  = await character.json()
+
+  displayData.value = {
+    gender: characterDetails.value?.gender,
+    hair_color: characterDetails.value?.hair_color,
+    eye_color: characterDetails.value?.eye_color,
+    birth_year: characterDetails.value?.birth_year
+  }
 }
 
 watch(() => props.id, async () => {
   await getCharacter()
 }, { immediate: true })
-
 </script>
 
 <template>
@@ -37,10 +49,7 @@ watch(() => props.id, async () => {
   <div v-else-if="characterDetails">
     <h3 class="details-card-title">{{ characterDetails?.name }}</h3>
     <div class="details-card-meta" >
-      <p>{{ characterDetails.gender }}</p>
-      <p>{{ characterDetails.hair_color }}</p>
-      <p>{{ characterDetails.eye_color }}</p>
-      <p>{{ characterDetails.birth_year }}</p>
+      <p v-for="(value, i) in Object.values(displayData)" :key="i">{{ value }}</p>
     </div>
   </div>
 </div>
@@ -70,5 +79,10 @@ watch(() => props.id, async () => {
     color: lavender;
     background: slategrey;
   }
+}
+
+.details-card-title {
+  color: palegoldenrod;
+  font-weight: bold;
 }
 </style>
