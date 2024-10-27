@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import {ref} from 'vue'
 
-import type { Character, Film, FilmsResponse } from '@/types/filmTypes'
+import type { Film, FilmsResponse } from '@/types/filmTypes'
 
 import DetailsCard from '@/components/base/DetailsCard/DetailsCard.vue'
 
 const films = ref<Film[]>([])
-const character = ref<Character>()
+const characterIds = ref<string[]>([])
 const showTryLater = ref<boolean>(false)
 
 const getFilms = async (): Promise<void> => {
@@ -23,14 +23,19 @@ const getFilms = async (): Promise<void> => {
 
 getFilms()
 
-const setCharacters = async (filmId: number): Promise<void> => {
-  // characterArray: string[]
-  // const characterListIds =
+const setCharacters = async (filmUrl: string): Promise<void> => {
+  // clear out to avoid duplicates
+  characterIds.value = []
 
-  console.log(filmId)
-  const response = await fetch(`https://swapi.dev/api/people/${3}`)
+  // find the characters - use film url
+  const filmData = await fetch(filmUrl)
+  const film = await filmData.json()
+  const filmCharacters = film.characters
 
-  console.log(await response.json())
+  // loop through character urls, get ids for all
+  filmCharacters.forEach((characterUrl: string) => {
+    characterIds.value.push(characterUrl.split('/')[5])
+  })
 }
 
 </script>
@@ -44,16 +49,21 @@ const setCharacters = async (filmId: number): Promise<void> => {
         <p>We can't load the films right now, please try again.</p>
       </div>
 
-      <template v-else>
-        <div class="cards-container-left">
-          <h3 class="cards-container-title">Films</h3>
+      <template v-else-if="films">
+        <suspense>
+          <div class="cards-container-left">
+            <h3 class="cards-container-title">Films</h3>
 
-          <details-card v-for="film in films" :key="film.episode_id" :film @set-characters="setCharacters" />
-        </div>
+            <details-card v-for="film in films" :key="film.episode_id" :film @set-characters="setCharacters" />
+          </div>
+        </suspense>
+
         <div class="cards-container-right">
           <h3 class="cards-container-title">Characters</h3>
 
-          <details-card v-if="character" :character />
+          <template v-if="characterIds.length > 0">
+            <details-card v-for="id in characterIds" :key="id"  :id="id" />
+          </template>
         </div>
       </template>
 
