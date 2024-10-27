@@ -32,7 +32,9 @@ const getCharacter = async (): Promise<void> => {
 }
 
 watch(() => props.id, async () => {
-  await getCharacter()
+  if (props.id !== undefined) {
+    await getCharacter()
+  }
 }, { immediate: true })
 </script>
 
