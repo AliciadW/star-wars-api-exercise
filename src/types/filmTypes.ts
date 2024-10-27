@@ -40,3 +40,10 @@ export interface Character {
   edited: string
   url: string
 }
+
+export interface CharacterMeta {
+  hair_color: string | undefined
+  eye_color: string | undefined
+  birth_year: string | undefined
+  gender: string | undefined
+}
