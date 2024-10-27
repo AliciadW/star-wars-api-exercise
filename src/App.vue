@@ -10,6 +10,9 @@ const characterIds = ref<string[]>([])
 const showTryLater = ref<boolean>(false)
 const countStart  =ref<number>(0)
 const countEnd = ref<number>(countStart.value + 6)
+
+// TODO: add test suite
+// TODO: Break out to new components - clean up App.vue / simplify
 const showNextButton = computed<boolean>(() => {
   return countEnd.value < characterIds.value.length
 })
@@ -58,40 +61,37 @@ const getNextSet = async (): Promise<void> => {
     countEnd.value = countEnd.value + 5
   }
 }
-
 </script>
 
 <template>
-  <div>
-    <h1 class="app-title">Star Wars App</h1>
+  <h1 class="app-title">Star Wars App</h1>
 
-    <div class="cards-container">
-      <div v-if="showTryLater">
-        <p>We can't load the films right now, please try again.</p>
-      </div>
-
-      <template v-else-if="films">
-        <suspense>
-          <div class="cards-container-left">
-            <h3 class="cards-container-title">Films</h3>
-
-            <details-card v-for="film in films" :key="film.episode_id" :film @set-characters="setCharacters" />
-          </div>
-        </suspense>
-
-        <div class="cards-container-right">
-          <div class="cards-container-with-button" v-if="characterIds.length > 0">
-            <div>
-              <h3 class="cards-container-title">Characters</h3>
-              <details-card v-for="id in showFiveAtATime" :key="id"  :id="id" />
-            </div>
-
-            <button v-if="showNextButton" @click="getNextSet">Show next 5</button>
-          </div>
-        </div>
-      </template>
-
+  <div class="cards-container">
+    <div v-if="showTryLater">
+      <p>We can't load the films right now, please try again.</p>
     </div>
+
+    <template v-else-if="films">
+      <suspense>
+        <div class="cards-container-left">
+          <h3 class="cards-container-title">Films</h3>
+
+          <details-card v-for="film in films" :key="film.episode_id" :film @set-characters="setCharacters" />
+        </div>
+      </suspense>
+
+      <div class="cards-container-right">
+        <div class="cards-container-with-button" v-if="characterIds.length > 0">
+          <div>
+            <h3 class="cards-container-title">Characters</h3>
+            <details-card v-for="id in showFiveAtATime" :key="id"  :id="id" />
+          </div>
+
+          <button v-if="showNextButton" @click="getNextSet">Show next 5</button>
+        </div>
+      </div>
+    </template>
+
   </div>
 </template>
 

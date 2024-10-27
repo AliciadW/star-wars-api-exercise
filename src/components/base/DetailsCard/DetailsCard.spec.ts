@@ -9,4 +9,8 @@ describe('DetailsCard', () => {
 
     expect(wrapper.exists()).toBe(true)
   })
+
+  // TODO add tests for:
+  // * dateToDisplay
+  // * getCharacter
 })
